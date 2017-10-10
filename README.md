@@ -1,4 +1,4 @@
-5DGate API demos.
+5DGate API 对接示例代码.
 ========
 
 本项目是黑曜石公司 API 接口对接的示例代码。
