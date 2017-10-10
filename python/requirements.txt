@@ -1,0 +1,4 @@
+# https://pypi.python.org/pypi/pycrypto
+# sudo pip install pycrypto==2.6.1
+
+pycrypto==2.6.1
