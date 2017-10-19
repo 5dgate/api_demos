@@ -25,7 +25,7 @@ public class demo {
         patameter.setUrl("api host");
         //@TODO 填入我方对外公钥
         patameter.setPublicKey("public key");
-        //@TODO 填入客户解密公钥
+        //@TODO 填入客户解密私钥
         patameter.setPrivateKey("private key");
         //@TODO 构造请求体
         patameter.setData("{ \"customerId\": \"客户请求唯一编号\", \"productId\": \"产品编号，邮件告知\", \"name\": \"请求参数：姓名\"}");
