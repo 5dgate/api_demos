@@ -39,8 +39,6 @@ openssl rsa -in app_private_key.pem -pubout -out your_public_key.pem
 
 # Java 开发者，需要将私钥转换成 PKCS8 格式
 openssl pkcs8 -topk8 -inform PEM -in app_private_key.pem -outform PEM -nocrypt -out your_private_key_pkcs8.pem
-
-
 ```
 
 请注意：
