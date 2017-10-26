@@ -9,6 +9,7 @@ import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -18,9 +19,13 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 
 /**
  * Copyright (C), 2017, 黑曜石
@@ -43,7 +48,7 @@ public class HttpRequest {
             LOGGER.info("创建SSL连接失败");
         }
         Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-            .register("https", sslsf)
+            .register("https", PlainConnectionSocketFactory.INSTANCE).register("https", trustAllHttpsCertificates())
             .register("http", new PlainConnectionSocketFactory())
             .build();
         cm = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
@@ -56,6 +61,40 @@ public class HttpRequest {
             .setConnectionManager(cm)
             .build();
         return httpClient;
+    }
+
+    private static SSLConnectionSocketFactory trustAllHttpsCertificates() {
+        SSLConnectionSocketFactory socketFactory = null;
+        TrustManager[] trustAllCerts = new TrustManager[1];
+        TrustManager tm = new miTM();
+        trustAllCerts[0] = tm;
+        SSLContext sc = null;
+        try {
+            sc = SSLContext.getInstance("TLS");//sc = SSLContext.getInstance("TLS")
+            sc.init(null, trustAllCerts, null);
+            socketFactory = new SSLConnectionSocketFactory(sc, NoopHostnameVerifier.INSTANCE);
+            //HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+        return socketFactory;
+    }
+
+    static class miTM implements TrustManager, X509TrustManager {
+
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            //don't check
+        }
+
+        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            //don't check
+        }
     }
 
     /**
