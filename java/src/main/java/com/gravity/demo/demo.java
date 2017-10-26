@@ -45,11 +45,22 @@ public class demo {
         jsonObject.put("data", data);
         jsonObject.put("sign", sign);
         String response = HttpRequest.post(patameter.getUrl(), jsonObject.toJSONString());
-        LOGGER.info("返回结果：" + response);
-        Map<String, String> parse = (Map<String, String>) JSONObject.parse(response);
+
+        JSONObject parse = (JSONObject) JSONObject.parse(response);
         if (null != response) {
-            String decrypt = new RSAUtil().decrypt(patameter.getPrivateKey(), parse.get("data"));
-            LOGGER.info("解密结果：" + decrypt);
+            LOGGER.info("返回结果：" + response);
+            StringBuilder sb = new StringBuilder();
+            sb.append("data").append(parse.get("data")).append("encrypt").append(parse.get("encrypt"));
+            String resultSign = MD5Util.encrypt(sb.toString());
+            if(resultSign.equals(parse.get("sign"))) {
+                LOGGER.info("验证返回签名正确");
+                String decrypt = new RSAUtil().decrypt(patameter.getPrivateKey(), parse.get("data").toString());
+                LOGGER.info("解密结果：" + decrypt);
+            } else {
+                LOGGER.error("验签返回签名错误，数据可能被篡改");
+            }
+        } else {
+            LOGGER.error("返回结果为空");
         }
     }
 }
