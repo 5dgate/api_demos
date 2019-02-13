@@ -12,6 +12,7 @@
 api_demos           项目根目录
     java            Java 示例
     python          Python 示例
+    php             PHP 示例
     REAMDME.md      说明文档
 ```
 
